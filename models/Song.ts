@@ -1,18 +1,19 @@
 // Modelo Songs, guardara el inventario de las alabanzas
 
 import mongoose, { Schema, Document, model, models } from 'mongoose';
+import { IArtist } from './Artist';
 
 // 1. Deifinimos la interfaz de TypeScript
 export interface ISong extends Document {
     title: string;
-    artist?: string; //Opcional
+    artist: mongoose.Types.ObjectId | IArtist; //Referencia al modelo Artist
     lyrics: string;
     createdAt: Date;
 }
 
 const SongSchema = new Schema<ISong>({
     title: { type: String, require: [true, 'El titulo es necesario'] },
-    artist: { type: String, default: 'Desconocido' },
+    artist: { type: Schema.Types.ObjectId, ref: 'Artist', required: [true, 'El Artista es requerido'] },
     lyrics: { type: String, require: [true, 'Lyrics are required'] },
     createdAt: { type: Date, default: Date.now },
 });
