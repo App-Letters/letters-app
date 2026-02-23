@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnet from "../../../../lib/mongodb";
 import Song from '../../../../models/Song';
+import '../../../models/Artist';
 
 interface Params {
     params: { id: string };
@@ -10,7 +11,7 @@ interface Params {
 export async function GET(request: Request, { params }: Params) {
     try {
         await dbConnet();
-        const song = await Song.findById(params.id);
+        const song = await Song.findById(params.id).populate('artist');
         if (!song) {
             return NextResponse.json({ error: 'Song not found' }, { status: 404 });
         }
@@ -29,7 +30,8 @@ export async function PUT(request: Request, { params }: Params) {
         const updatedSong = await Song.findByIdAndUpdate(params.id, body, {
             new: true, //Devuelve el documento actualizado
             runValidators: true, // Asegura que se respeten las reglas del modelo
-        });
+        }).populate('artist');
+
         if (!updatedSong) {
             return NextResponse.json({ error: 'Canción no encontrada ' }, { status: 404 });
         }
