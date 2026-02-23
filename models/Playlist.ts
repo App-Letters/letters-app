@@ -11,7 +11,7 @@ export interface IPlaylist extends Document {
 const PlaylistSchema = new Schema<IPlaylist>({
     tittle: {
         type: String,
-        default: 'Canciones para el Shabat'
+        required: [true, 'El titulo es necesario']
     },
     date: {
         type: Date,
