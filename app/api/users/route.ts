@@ -51,3 +51,21 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
     }
 }
+// GET: Obtener todos los usuarios (Solo superadmin)
+export async function GET(request: Request) {
+    try {
+        const session = await getServerSession(authOptions);
+
+        if (!session || (session.user as any).role !== 'superadmin') {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+        }
+
+        await dbConnect();
+        // Buscamos a todos los usuarios, pero excluimos el campo 'password' por seguridad usando el select('-password')
+        const users = await User.find({}).select('-password');
+
+        return NextResponse.json(users, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
+    }
+}
