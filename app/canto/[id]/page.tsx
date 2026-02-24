@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Loader2, ZoomIn, ZoomOut, AlertCircle, ChevronLeft, ChevronRight, Music } from "lucide-react";
+import { ArrowLeft, Loader2, ZoomIn, ZoomOut, AlertCircle, ChevronLeft, ChevronRight, Music, Guitar } from "lucide-react";
 
 interface Song {
     _id: string;
@@ -23,6 +23,8 @@ function CantoContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
     const [fontSize, setFontSize] = useState(20);
+
+    const [showChords, setShowChords] = useState(false);
 
     const [prevSongId, setPrevSongId] = useState<string | null>(null);
     const [nextSongId, setNextSongId] = useState<string | null>(null);
@@ -64,6 +66,51 @@ function CantoContent() {
     const increaseFont = () => setFontSize(prev => Math.min(prev + 2, 44));
     const decreaseFont = () => setFontSize(prev => Math.max(prev - 2, 14));
 
+    // --- LÓGICA DE ACORDES (Ajustada para Celulares) ---
+
+    const getCleanLyrics = (text: string) => {
+        return text.replace(/\[.*?\]/g, "");
+    };
+
+    const renderLyricsWithChords = useCallback((lyrics: string) => {
+        return lyrics.split('\n').map((line, lineIndex) => {
+            if (!line.trim()) return <div key={lineIndex} className="h-6 sm:h-8"></div>;
+
+            const chunks = line.split(/(\[[^\]]+\][^\[]*)/g).filter(Boolean);
+
+            return (
+                // AQUÍ ESTÁ LA MAGIA NUEVA: flex-wrap permite que si no cabe, baje a la siguiente línea.
+                // gap-y-3 asegura que si baja, deje un espacio para que no choque con la de arriba.
+                <div key={lineIndex} className="flex flex-wrap items-end gap-y-3 mb-3 sm:mb-5">
+                    {chunks.map((chunk, chunkIndex) => {
+                        let chord = "";
+                        let text = chunk;
+
+                        if (chunk.startsWith('[')) {
+                            const parts = chunk.split(']');
+                            chord = parts[0].substring(1);
+                            text = parts[1] || "";
+                        }
+
+                        return (
+                            <div key={chunkIndex} className="flex flex-col justify-end">
+                                <span className="text-orange-500 dark:text-orange-400 font-bold min-h-[1.5rem] leading-none">
+                                    {chord}
+                                </span>
+                                {/* whitespace-pre-wrap mantiene los espacios pero permite a la palabra romperse si es muy larga */}
+                                <span className="whitespace-pre-wrap text-slate-900 dark:text-slate-100">
+                                    {text}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+        });
+    }, []);
+
+    // ---------------------------------------
+
     if (isLoading) {
         return (
             <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
@@ -94,12 +141,31 @@ function CantoContent() {
         <div className="min-h-screen bg-gradient-to-b from-blue-50/40 to-white dark:from-slate-950 dark:to-slate-900 pb-32 transition-colors duration-300">
             <header className="sticky top-0 z-20 bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-slate-800/50 shadow-sm transition-all">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 text-gray-600 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 font-bold bg-white/50 dark:bg-slate-800/50 hover:bg-blue-50 dark:hover:bg-slate-700 px-4 py-2 rounded-full transition-all border border-transparent hover:border-blue-100 dark:hover:border-slate-600 active:scale-95">
+                    <Link
+                        href={playlistId ? "/" : "/alabanzas"}
+                        className="flex items-center gap-2 text-gray-600 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 font-bold bg-white/50 dark:bg-slate-800/50 hover:bg-blue-50 dark:hover:bg-slate-700 px-4 py-2 rounded-full transition-all border border-transparent hover:border-blue-100 dark:hover:border-slate-600 active:scale-95"
+                    >
                         <ArrowLeft className="w-5 h-5" />
-                        <span className="hidden sm:inline">Repertorio</span>
+                        <span className="hidden sm:inline">
+                            {playlistId ? "Repertorio" : "Catálogo"}
+                        </span>
                     </Link>
 
                     <div className="flex items-center gap-2 sm:gap-4">
+                        <button
+                            onClick={() => setShowChords(!showChords)}
+                            className={`p-2 rounded-full transition-all border flex items-center gap-2 active:scale-95 ${showChords
+                                ? "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800"
+                                : "bg-white text-gray-500 border-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:bg-gray-50"
+                                }`}
+                            title={showChords ? "Ocultar acordes" : "Ver acordes"}
+                        >
+                            <Guitar className="w-5 h-5" />
+                            <span className="text-xs font-bold hidden sm:inline">
+                                {showChords ? "Acordes ON" : "Acordes OFF"}
+                            </span>
+                        </button>
+
                         {playlistId && (
                             <div className="flex items-center bg-white dark:bg-slate-800 p-1 rounded-full border border-gray-200 dark:border-slate-700 shadow-sm">
                                 <Link href={prevSongId ? `/canto/${prevSongId}?playlist=${playlistId}` : '#'} className={`p-2 rounded-full transition-all ${prevSongId ? 'text-gray-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 active:scale-95' : 'text-gray-300 dark:text-slate-600 pointer-events-none'}`}>
@@ -140,9 +206,20 @@ function CantoContent() {
                     </div>
                 </div>
 
-                <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm sm:bg-white sm:dark:bg-slate-900 sm:shadow-xl sm:border border-gray-100 dark:border-slate-800 rounded-3xl p-6 sm:p-12 transition-all duration-300 max-w-3xl mx-auto">
-                    <div className="text-slate-800 dark:text-slate-200 font-medium mx-auto text-center sm:text-left transition-all duration-300" style={{ fontSize: `${fontSize}px`, whiteSpace: "pre-wrap", wordBreak: "break-word", lineHeight: "1.8" }}>
-                        {song.lyrics}
+                <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm sm:bg-white sm:dark:bg-slate-900 sm:shadow-xl sm:border border-gray-100 dark:border-slate-800 rounded-3xl p-6 sm:p-12 transition-all duration-300 max-w-4xl mx-auto overflow-hidden">
+                    {/* Quitamos el contenedor rígido con scroll para que la letra pueda bajar libremente */}
+                    <div className="w-full pb-4">
+                        <div
+                            className={`mx-auto ${showChords ? 'text-left font-mono tracking-tight' : 'text-center sm:text-left text-slate-800 dark:text-slate-200'} transition-all duration-300`}
+                            style={{
+                                fontSize: `${fontSize}px`,
+                                whiteSpace: "pre-wrap", // Obligamos a que las palabras bajen si no caben
+                                wordBreak: "break-word",
+                                lineHeight: showChords ? "normal" : "1.8"
+                            }}
+                        >
+                            {showChords ? renderLyricsWithChords(song.lyrics) : getCleanLyrics(song.lyrics)}
+                        </div>
                     </div>
                 </div>
             </main>

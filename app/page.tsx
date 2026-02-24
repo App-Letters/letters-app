@@ -126,6 +126,17 @@ export default function HomePage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 mt-10 sm:mt-14 space-y-10">
+
+        <div className="flex justify-center">
+          <div className="bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-800 inline-flex transition-colors">
+            <div className="px-6 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-sm transition-colors">
+              Repertorios
+            </div>
+            <Link href="/alabanzas" className="px-6 py-2.5 rounded-xl text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white font-medium text-sm transition-colors">
+              Todas las Alabanzas
+            </Link>
+          </div>
+        </div>
         <div className="text-center space-y-3 mb-10">
           <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight transition-colors">
             Repertorios de Shabat
