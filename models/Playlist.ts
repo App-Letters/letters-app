@@ -2,14 +2,14 @@ import mongoose, { Schema, Document, model, models } from 'mongoose';
 import { ISong } from './Song';
 
 export interface IPlaylist extends Document {
-    tittle: string;
+    title: string;
     date: Date;
     songs: mongoose.Types.ObjectId[] | ISong[];
     isActive: boolean
 }
 
 const PlaylistSchema = new Schema<IPlaylist>({
-    tittle: {
+    title: {
         type: String,
         required: [true, 'El titulo es necesario']
     },
@@ -19,7 +19,7 @@ const PlaylistSchema = new Schema<IPlaylist>({
     },
     songs: [{
         type: Schema.Types.ObjectId,
-        ref: 'Canción'
+        ref: 'Song'
     }],
     isActive: {
         type: Boolean,
