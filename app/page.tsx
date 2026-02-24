@@ -106,6 +106,7 @@ export default function HomePage() {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
+                        timeZone: "UTC",
                       }).replace(/^\w/, (c) => c.toUpperCase())}
                     </div>
                   </div>

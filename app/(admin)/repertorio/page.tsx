@@ -169,6 +169,7 @@ export default function RepertoriosPage() {
                                                 year: "numeric",
                                                 month: "long",
                                                 day: "numeric",
+                                                timeZone: "UTC",
                                             })}
                                         </td>
                                         <td className="p-4 text-center">

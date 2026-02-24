@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../lib/mongodb';
 import Playlist from '../../../models/Playlist';
-import '../../../models/Song'; // Importamos el modelo Song por si acaso
+import '../../../models/Song';
+import '../../../models/Artist';
 
 // GET: Obtener todas las listas
 export async function GET() {
