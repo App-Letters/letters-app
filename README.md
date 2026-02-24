@@ -1,7 +1,3 @@
-¡Claro que sí! Un archivo `README.md` bien estructurado es la carta de presentación de cualquier desarrollador profesional. Demuestra orden, claridad y hace que tu repositorio destaque en GitHub como un proyecto serio (ideal para tu portafolio).
-
-Crea un archivo llamado **`README.md`** en la raíz de tu proyecto (al mismo nivel que tu `package.json`) y pega todo este contenido. Lo he redactado con un tono técnico, profesional y detallando todas las funcionalidades increíbles que construimos:
-
 ```markdown
 # 📖 Hallel Kehila - Himnario y Gestor de Repertorios Digital
 
