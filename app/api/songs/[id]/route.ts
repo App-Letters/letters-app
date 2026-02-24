@@ -1,40 +1,48 @@
-import { NextResponse } from "next/server";
-import dbConnet from "../../../../lib/mongodb";
+import { NextResponse } from 'next/server';
+import dbConnect from '../../../../lib/mongodb';
 import Song from '../../../../models/Song';
-import '../../../models/Artist';
+import '../../../../models/Artist';
 
-interface Params {
-    params: { id: string };
-}
+// Actualizamos la interfaz para decirle a TypeScript que params ahora es una Promesa
+type Context = {
+    params: Promise<{ id: string }>;
+};
 
-// GET: Obtener una canción por ID
-export async function GET(request: Request, { params }: Params) {
+// GET: Obtener una canción específica por su ID
+export async function GET(request: Request, { params }: Context) {
     try {
-        await dbConnet();
-        const song = await Song.findById(params.id).populate('artist');
+        const { id } = await params; // <--- AQUÍ ESTÁ LA MAGIA (Esperamos la promesa)
+
+        await dbConnect();
+        const song = await Song.findById(id).populate('artist');
+
         if (!song) {
             return NextResponse.json({ error: 'Song not found' }, { status: 404 });
         }
+
         return NextResponse.json(song, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch song' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch the song' }, { status: 500 });
     }
 }
 
-// PUT: Actualizar una canción (Ej. corregir un error en la letra)
-export async function PUT(request: Request, { params }: Params) {
+// PUT: Actualizar una canción
+export async function PUT(request: Request, { params }: Context) {
     try {
-        await dbConnet();
+        const { id } = await params; // <--- Esperamos la promesa
+
+        await dbConnect();
         const body = await request.json();
 
-        const updatedSong = await Song.findByIdAndUpdate(params.id, body, {
-            new: true, //Devuelve el documento actualizado
-            runValidators: true, // Asegura que se respeten las reglas del modelo
+        const updatedSong = await Song.findByIdAndUpdate(id, body, {
+            new: true,
+            runValidators: true,
         }).populate('artist');
 
         if (!updatedSong) {
-            return NextResponse.json({ error: 'Canción no encontrada ' }, { status: 404 });
+            return NextResponse.json({ error: 'Song not found' }, { status: 404 });
         }
+
         return NextResponse.json(updatedSong, { status: 200 });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to update song' }, { status: 500 });
@@ -42,14 +50,18 @@ export async function PUT(request: Request, { params }: Params) {
 }
 
 // DELETE: Eliminar una canción
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params }: Context) {
     try {
-        await dbConnet();
-        const deletedSong = await Song.findByIdAndDelete(params.id);
+        const { id } = await params; // <--- Esperamos la promesa
+
+        await dbConnect();
+        const deletedSong = await Song.findByIdAndDelete(id);
+
         if (!deletedSong) {
-            return NextResponse.json({ error: 'Canción no encontrada ' }, { status: 404 });
+            return NextResponse.json({ error: 'Song not found' }, { status: 404 });
         }
-        return NextResponse.json({ message: 'Canción eliminada correctamente' }, { status: 200 });
+
+        return NextResponse.json({ message: 'Song deleted successfully' }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to delete song' }, { status: 500 });
     }
