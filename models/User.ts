@@ -1,4 +1,4 @@
-import mongose, { Schema, Document, model, models } from 'mongoose';
+import mongoose, { Schema, Document, model, models } from 'mongoose';
 
 export interface IUser extends Document {
     email: string;
@@ -14,8 +14,13 @@ const UserSchema = new Schema<IUser>({
     },
     password: {
         type: String,
-        default: 'admin'
+        required: [true, 'La contraseña es requerida']
     },
+    role: {
+        type: String,
+        enum: ['admin', 'superadmin'], // Solo permite estos dos valores exactos
+        default: 'admin'
+    }
 });
 
 export default models.User || model<IUser>('User', UserSchema);
