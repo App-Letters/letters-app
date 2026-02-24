@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Music, Mic2, ListMusic, Users, LogOut, Menu, X } from "lucide-react";
+import { Music, Mic2, ListMusic, Users, LogOut, Menu, X, UserCircle } from "lucide-react";
 
 export default function Sidebar({ role }: { role: string }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +15,7 @@ export default function Sidebar({ role }: { role: string }) {
         { name: "Hallel", href: "/dashboard", icon: Music },
         { name: "Artistas", href: "/artistas", icon: Mic2 },
         { name: "Repertorio", href: "/repertorio", icon: ListMusic },
+        { name: "Mi Perfil", href: "/perfil", icon: UserCircle },
     ];
 
     // Si es superadmin, le agregamos la ruta de usuarios

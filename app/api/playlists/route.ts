@@ -7,7 +7,16 @@ import '../../../models/Song'; // Importamos el modelo Song por si acaso
 export async function GET() {
     try {
         await dbConnect();
-        const playlists = await Playlist.find({}).sort({ date: -1 });
+
+        // AQUÍ ESTÁ LA SOLUCIÓN: Agregamos populate para traer la información
+        // completa de las canciones y de sus respectivos artistas.
+        const playlists = await Playlist.find({})
+            .sort({ date: -1 })
+            .populate({
+                path: 'songs',
+                populate: { path: 'artist' }
+            });
+
         return NextResponse.json(playlists, { status: 200 });
     } catch (error) {
         console.error("Error en GET playlists:", error);
