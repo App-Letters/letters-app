@@ -270,16 +270,19 @@ export default function NuevoCantoPage() {
 
                     {/* Campo Letra */}
                     <div className="space-y-2">
-                        <div className="flex justify-between items-end">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-1">
                             <label htmlFor="lyrics" className="block text-sm font-medium text-gray-700">
                                 Letra completa
                             </label>
+                            <span className="text-xs text-gray-500">
+                                Opcional: Escribe los acordes entre corchetes [ ] antes de la sílaba.
+                            </span>
                         </div>
                         <textarea
                             id="lyrics"
                             value={lyrics}
                             onChange={(e) => setLyrics(e.target.value)}
-                            placeholder="Escribe o pega la letra aquí..."
+                            placeholder={"Escribe o pega la letra aquí...\n\nEjemplo de formato con acordes:\n[G]Bendice a [C]Israel alma [G]mía\n[G]Y YHWH te [C]dará de Su [D]bien\n[G]Bendice a [C]Israel alma [Em]mía [D] [C]\n[Am]No te olvides de [D]Jerusa[G]lén"}
                             rows={12}
                             className="w-full rounded-lg border-gray-300 border px-4 py-3 focus:ring-blue-500 focus:border-blue-500 resize-y"
                             required
