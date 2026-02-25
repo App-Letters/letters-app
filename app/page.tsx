@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Loader2, Music, Calendar, ChevronRight, BookOpen, Sun, Moon } from "lucide-react";
+import { Loader2, Music, Calendar, ChevronRight, BookOpen, Sun, Moon, Play } from "lucide-react";
 import Footer from "../components/shared/Footer";
 
 interface Song {
@@ -19,7 +19,7 @@ interface Playlist {
   songs: Song[];
 }
 
-// --- COMPONENTE ANIMADO AL HACER SCROLL (Animación en cada scroll) ---
+// --- COMPONENTE ANIMADO AL HACER SCROLL ---
 function FadeInView({ children, delay = 0 }: { children: React.ReactNode, delay?: number }) {
   const [isVisible, setIsVisible] = useState(false);
   const domRef = useRef<HTMLDivElement>(null);
@@ -30,30 +30,25 @@ function FadeInView({ children, delay = 0 }: { children: React.ReactNode, delay?
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setIsVisible(true);
-          } else {
-            setIsVisible(false);
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1 }
+      { rootMargin: "0px 0px -50px 0px" }
     );
 
     if (domRef.current) {
       observer.observe(domRef.current);
     }
-    return () => {
-      if (domRef.current) {
-        observer.unobserve(domRef.current);
-      }
-    };
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div
       ref={domRef}
       className={`w-full transition-all duration-700 ease-out ${isVisible
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-12"
+        ? "opacity-100 translate-y-0"
+        : "opacity-0 translate-y-12"
         }`}
       style={{ transitionDelay: `${delay}ms` }}
     >
@@ -118,7 +113,7 @@ export default function HomePage() {
 
         setActivePlaylists(sorted);
       } catch (err) {
-        setError("No pudimos cargar los cantos en este momento. Intenta recargar la página.");
+        setError("No pudimos cargar los cantos en este momento.");
       } finally {
         setIsLoading(false);
       }
@@ -171,7 +166,7 @@ export default function HomePage() {
                 Repertorios
               </div>
               <Link href="/alabanzas" className="px-6 py-2.5 rounded-xl text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white font-medium text-sm transition-colors">
-                Todas las Alabanzas
+                Alabanzas
               </Link>
             </div>
           </div>
@@ -180,7 +175,7 @@ export default function HomePage() {
               Repertorios
             </h2>
             <p className="text-lg text-gray-500 dark:text-slate-400 transition-colors">
-              Selecciona un canto para leer la letra y acompañar la alabanza.
+              Selecciona un evento para ver su lista de cantos.
             </p>
           </div>
         </FadeInView>
@@ -204,60 +199,64 @@ export default function HomePage() {
             </div>
           </FadeInView>
         ) : (
-          <div className="space-y-10 w-full">
+          <div className="space-y-6 w-full">
             {activePlaylists.map((playlist, index) => (
-              <FadeInView key={playlist._id} delay={index * 150}>
-                <section className="w-full bg-white dark:bg-slate-900 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300">
+              <FadeInView key={playlist._id} delay={index * 100}>
 
-                  {/* --- ENCABEZADO ACTUALIZADO: Píldora siempre a la derecha --- */}
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 p-6 sm:p-8 text-white relative">
+                {/* --- TODA LA TARJETA ES UN LINK A LA PÁGINA DEL REPERTORIO --- */}
+                <Link href={`/repertorio/${playlist._id}`} className="block group outline-none">
+                  <section className="w-full bg-white dark:bg-slate-900 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:border-blue-200 dark:group-hover:border-blue-900/50">
 
-                    <div className="pr-20 sm:pr-24">
-                      <h3 className="text-2xl font-extrabold tracking-tight">{playlist.title}</h3>
-                      <div className="flex items-center gap-2 mt-2 text-blue-100 dark:text-blue-200 text-sm font-semibold">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(playlist.date).toLocaleDateString("es-MX", {
-                          weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
-                        }).replace(/^\w/, (c) => c.toUpperCase())}
+                    {/* Encabezado APPLE MUSIC STYLE */}
+                    <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 p-6 sm:p-8 text-white overflow-hidden">
+                      {/* Efectos de luces de fondo (Glassmorfismo) */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 transition-transform duration-500 group-hover:scale-110"></div>
+                      <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-500/30 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 transition-transform duration-500 group-hover:scale-110"></div>
+
+                      <div className="relative z-10 flex items-start justify-between gap-4">
+
+                        {/* Título y Fecha */}
+                        <div className="pr-4">
+                          <h3 className="text-3xl font-black tracking-tight drop-shadow-sm mb-2">{playlist.title}</h3>
+                          <div className="flex items-center gap-2 text-blue-100 text-sm font-medium">
+                            <Calendar className="w-4 h-4 opacity-80" />
+                            {new Date(playlist.date).toLocaleDateString("es-MX", {
+                              weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
+                            }).replace(/^\w/, (c) => c.toUpperCase())}
+                          </div>
+                        </div>
+
+                        {/* Controles de la derecha (Píldora y Botón Play) */}
+                        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 shrink-0">
+                          {/* Píldora X Cantos */}
+                          <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full inline-flex items-center w-fit text-xs sm:text-sm font-bold border border-white/20 shadow-sm">
+                            <Music className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 opacity-80" />
+                            {playlist.songs.length} cantos
+                          </div>
+
+                          {/* Botón Decorativo Play (Aparece en pantallas grandes o al hacer hover) */}
+                          <div className="hidden sm:flex w-12 h-12 rounded-full bg-white text-blue-600 items-center justify-center shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-50">
+                            <Play className="w-5 h-5 ml-1" fill="currentColor" />
+                          </div>
+                        </div>
+
                       </div>
                     </div>
 
-                    <div className="absolute top-6 right-6 bg-white/20 dark:bg-black/20 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl inline-flex items-center w-fit text-xs sm:text-sm font-bold border border-white/10">
-                      <Music className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                      {playlist.songs.length} cantos
+                    {/* Sección inferior para guiar al usuario a hacer clic */}
+                    <div className="px-6 py-4 bg-white dark:bg-slate-900 flex items-center justify-between border-t border-gray-50 dark:border-slate-800/50">
+                      <span className="text-sm font-bold text-gray-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        Ver repertorio completo
+                      </span>
+                      <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors">
+                        <ChevronRight className="w-4 h-4 text-gray-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                      </div>
                     </div>
 
-                  </div>
-                  {/* ------------------------------------------------------------- */}
+                  </section>
+                </Link>
+                {/* ----------------------------------------------------------- */}
 
-                  <ul className="divide-y divide-gray-100 dark:divide-slate-800">
-                    {playlist.songs.map((song, songIndex) => {
-                      if (!song || !song._id) return null;
-                      return (
-                        <li key={`${playlist._id}-${song._id}`}>
-                          <Link href={`/canto/${song._id}?playlist=${playlist._id}`} className="flex items-center justify-between p-5 sm:p-6 hover:bg-blue-50 dark:hover:bg-slate-800/50 transition-colors active:bg-blue-100 dark:active:bg-slate-800 group">
-                            <div className="flex items-center gap-5">
-                              <span className="text-xl font-black text-gray-200 dark:text-slate-700 w-8 text-center transition-colors">
-                                {songIndex + 1}
-                              </span>
-                              <div>
-                                <p className="font-bold text-gray-900 dark:text-gray-100 text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                  {song.title}
-                                </p>
-                                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5 transition-colors">
-                                  {song.artist?.name || "Autor desconocido"}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors">
-                              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
-                            </div>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </section>
               </FadeInView>
             ))}
           </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Loader2, Music, ChevronRight, BookOpen, Sun, Moon, Search, Library } from "lucide-react";
+import { Loader2, Music, ChevronRight, BookOpen, Sun, Moon, Search, Library, Play } from "lucide-react";
 
 interface Song {
     _id: string;
@@ -40,7 +40,11 @@ export default function AlabanzasPage() {
                 const response = await fetch("/api/songs");
                 if (!response.ok) throw new Error("Error al cargar las alabanzas");
                 const data: Song[] = await response.json();
-                setSongs(data);
+
+                // Ordenar alfabéticamente por título para que el catálogo tenga sentido
+                const sortedData = data.sort((a, b) => a.title.localeCompare(b.title));
+                setSongs(sortedData);
+
             } catch (err) {
                 setError("No pudimos cargar el catálogo. Intenta recargar la página.");
             } finally {
@@ -51,7 +55,6 @@ export default function AlabanzasPage() {
         fetchSongs();
     }, []);
 
-    // Función para normalizar texto (quitar acentos y mayúsculas para búsquedas exactas)
     const normalizeText = (text: string) => {
         return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     };
@@ -97,7 +100,7 @@ export default function AlabanzasPage() {
                 </div>
             </header>
 
-            <main className="max-w-3xl mx-auto px-4 sm:px-6 mt-8 sm:mt-10 space-y-8">
+            <main className="max-w-3xl mx-auto px-4 sm:px-6 mt-8 sm:mt-10 space-y-10">
 
                 {/* Menú de Navegación Público */}
                 <div className="flex justify-center">
@@ -106,33 +109,34 @@ export default function AlabanzasPage() {
                             Repertorios
                         </Link>
                         <div className="px-6 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold text-sm transition-colors">
-                            Todas las Alabanzas
+                            Alabanzas
                         </div>
                     </div>
                 </div>
 
                 <div className="text-center space-y-3">
-                    <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight transition-colors">
-                        Catálogo General
+                    <h2 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight transition-colors">
+                        Alabanzas Disponibles
                     </h2>
                     <p className="text-lg text-gray-500 dark:text-slate-400 transition-colors">
-                        Busca cualquier alabanza por título o por el nombre del autor.
+                        Explora la biblioteca completa de cantos.
                     </p>
                 </div>
 
-                {/* Buscador Mágico */}
-                <div className="relative max-w-xl mx-auto">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Search className="h-5 w-5 text-gray-400 dark:text-slate-500" />
+                {/* --- Buscador Premium --- */}
+                <div className="relative max-w-2xl mx-auto">
+                    <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                        <Search className="h-6 w-6 text-gray-400 dark:text-slate-500" />
                     </div>
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Buscar cantos..."
-                        className="block w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors shadow-sm placeholder-gray-400 dark:placeholder-slate-500"
+                        placeholder="Buscar por título o autor..."
+                        className="block w-full pl-14 pr-6 py-5 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-full text-lg text-gray-900 dark:text-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-md hover:shadow-lg placeholder-gray-400 dark:placeholder-slate-500 outline-none"
                     />
                 </div>
+                {/* ------------------------ */}
 
                 {error ? (
                     <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-6 rounded-2xl text-center border border-red-100 dark:border-red-900/50">
@@ -149,31 +153,41 @@ export default function AlabanzasPage() {
                         </p>
                     </div>
                 ) : (
-                    <section className="bg-white dark:bg-slate-900 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300">
+                    <section className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300">
+
                         <div className="bg-gray-50 dark:bg-slate-800/50 px-6 py-4 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center transition-colors">
-                            <span className="text-sm font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                                {filteredSongs.length} Cantos disponibles
+                            <span className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
+                                {filteredSongs.length} Cantos encontrados
                             </span>
                         </div>
-                        <ul className="divide-y divide-gray-100 dark:divide-slate-800">
+
+                        {/* --- LISTA DE CANCIONES --- */}
+                        <ul className="divide-y divide-gray-50 dark:divide-slate-800/50">
                             {filteredSongs.map((song) => (
-                                <li key={song._id}>
-                                    {/* Fíjate que aquí enviamos al canto SIN el ?playlist=... */}
-                                    <Link href={`/canto/${song._id}`} className="flex items-center justify-between p-5 sm:p-6 hover:bg-blue-50 dark:hover:bg-slate-800/50 transition-colors active:bg-blue-100 dark:active:bg-slate-800 group">
-                                        <div className="flex items-center gap-5">
-                                            <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
-                                                <Music className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+                                <li key={song._id} className="group">
+                                    <Link href={`/canto/${song._id}`} className="flex items-center justify-between p-4 sm:p-5 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
+                                        <div className="flex items-center gap-4 sm:gap-6">
+
+                                            {/* Ícono Musical / Botón Play al hacer hover */}
+                                            <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-400 dark:text-slate-500 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
+                                                <Music className="w-5 h-5 group-hover:hidden transition-all" />
+                                                <Play className="w-5 h-5 hidden group-hover:block transition-all ml-0.5" fill="currentColor" />
                                             </div>
+
                                             <div>
-                                                <p className="font-bold text-gray-900 dark:text-gray-100 text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                <p className="font-bold text-gray-900 dark:text-gray-100 text-base sm:text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                                     {song.title}
                                                 </p>
-                                                <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5 transition-colors">
+                                                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-slate-400 mt-0.5 transition-colors">
                                                     {song.artist?.name || "Autor desconocido"}
                                                 </p>
                                             </div>
                                         </div>
-                                        <ChevronRight className="w-6 h-6 text-gray-300 dark:text-slate-600 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+
+                                        {/* Flecha indicadora (Oculta por defecto, aparece al hover) */}
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <ChevronRight className="w-5 h-5 text-gray-400 dark:text-slate-500" />
+                                        </div>
                                     </Link>
                                 </li>
                             ))}
