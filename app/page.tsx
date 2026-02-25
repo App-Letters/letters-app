@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Loader2, Music, Calendar, ChevronRight, BookOpen, Sun, Moon } from "lucide-react";
-
+import Footer from "../components/shared/Footer";
 interface Song {
   _id: string;
   title: string;
@@ -139,7 +139,7 @@ export default function HomePage() {
         </div>
         <div className="text-center space-y-3 mb-10">
           <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight transition-colors">
-            Repertorios de Shabat
+            Repertorios
           </h2>
           <p className="text-lg text-gray-500 dark:text-slate-400 transition-colors">
             Selecciona un canto para leer la letra y acompañar la alabanza.
@@ -212,6 +212,7 @@ export default function HomePage() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
