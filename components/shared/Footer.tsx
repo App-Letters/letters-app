@@ -48,7 +48,7 @@ export default function Footer() {
                                     1. Aviso de Propiedad Intelectual y Derechos de Autor
                                 </h4>
                                 <p className="leading-relaxed text-justify">
-                                    <strong>Hallel Kehila</strong> es una herramienta digital de código abierto desarrollada con fines estrictamente <strong>educativos, religiosos y sin fines de lucro</strong>. En cumplimiento con la Ley Federal del Derecho de Autor de los Estados Unidos Mexicanos (específicamente en lo referente a las limitaciones del derecho de autor para fines no lucrativos).
+                                    <strong>Hallel Kehila</strong> es una herramienta digital desarrollada con fines estrictamente <strong>educativos, religiosos y sin fines de lucro</strong>. En cumplimiento con la Ley Federal del Derecho de Autor de los Estados Unidos Mexicanos (específicamente en lo referente a las limitaciones del derecho de autor para fines no lucrativos).
                                 </p>
                                 <ul className="list-disc pl-5 space-y-2 marker:text-blue-500">
                                     <li><strong>Contenido de terceros:</strong> Las letras, títulos, y progresiones armónicas (acordes) mostrados en este catálogo son propiedad intelectual de sus respectivos compositores, autores y sellos discográficos. Hallel Kehila no reclama la autoría de dichas obras.</li>
