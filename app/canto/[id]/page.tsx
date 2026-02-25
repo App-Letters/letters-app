@@ -3,13 +3,14 @@
 import { useState, useEffect, Suspense, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Loader2, ZoomIn, ZoomOut, AlertCircle, ChevronLeft, ChevronRight, Music, Guitar } from "lucide-react";
+import { ArrowLeft, Loader2, ZoomIn, ZoomOut, AlertCircle, ChevronLeft, ChevronRight, Music, Guitar, Youtube, PlayCircle } from "lucide-react";
 
 interface Song {
     _id: string;
     title: string;
     lyrics: string;
-    tone?: string; // Lo ponemos opcional por si hay cantos viejos que no lo tienen
+    tone?: string;
+    url?: string; // <-- NUEVO: Agregado a la interfaz
     artist: { _id: string; name: string };
 }
 
@@ -26,6 +27,7 @@ function CantoContent() {
     const [fontSize, setFontSize] = useState(20);
 
     const [showChords, setShowChords] = useState(false);
+    const [showVideo, setShowVideo] = useState(false); // <-- ESTADO PARA EL VIDEO
 
     const [prevSongId, setPrevSongId] = useState<string | null>(null);
     const [nextSongId, setNextSongId] = useState<string | null>(null);
@@ -67,8 +69,17 @@ function CantoContent() {
     const increaseFont = () => setFontSize(prev => Math.min(prev + 2, 44));
     const decreaseFont = () => setFontSize(prev => Math.max(prev - 2, 14));
 
-    // --- LÓGICA DE ACORDES (Ajustada para Celulares) ---
+    // --- MAGIA: Extraer ID de YouTube de cualquier enlace ---
+    const getYouTubeId = (url: string) => {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    };
 
+    // Obtenemos el ID solo si hay una URL
+    const youtubeId = song?.url ? getYouTubeId(song.url) : null;
+
+    // --- LÓGICA DE ACORDES ---
     const getCleanLyrics = (text: string) => {
         return text.replace(/\[.*?\]/g, "");
     };
@@ -150,6 +161,25 @@ function CantoContent() {
                     </Link>
 
                     <div className="flex items-center gap-2 sm:gap-4">
+
+                        {/* --- BOTÓN DE YOUTUBE --- Aparece solo si hay ID válido */}
+                        {youtubeId && (
+                            <button
+                                onClick={() => setShowVideo(!showVideo)}
+                                className={`p-2 rounded-full transition-all border flex items-center gap-2 active:scale-95 ${showVideo
+                                    ? "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
+                                    : "bg-white text-gray-500 border-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 hover:bg-gray-50"
+                                    }`}
+                                title={showVideo ? "Ocultar video" : "Ver video"}
+                            >
+                                <PlayCircle className="w-5 h-5" />
+                                <span className="text-xs font-bold hidden sm:inline">
+                                    {showVideo ? "Cerrar Audio" : "Escuchar"}
+                                </span>
+                            </button>
+                        )}
+
+                        {/* --- BOTÓN DE ACORDES --- */}
                         <button
                             onClick={() => setShowChords(!showChords)}
                             className={`p-2 rounded-full transition-all border flex items-center gap-2 active:scale-95 ${showChords
@@ -164,6 +194,7 @@ function CantoContent() {
                             </span>
                         </button>
 
+                        {/* Controles de repertorio */}
                         {playlistId && (
                             <div className="flex items-center bg-white dark:bg-slate-800 p-1 rounded-full border border-gray-200 dark:border-slate-700 shadow-sm">
                                 <Link href={prevSongId ? `/canto/${prevSongId}?playlist=${playlistId}` : '#'} className={`p-2 rounded-full transition-all ${prevSongId ? 'text-gray-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 active:scale-95' : 'text-gray-300 dark:text-slate-600 pointer-events-none'}`}>
@@ -190,7 +221,7 @@ function CantoContent() {
             </header>
 
             <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
-                <div className="text-center mb-12 sm:mb-16 relative">
+                <div className="text-center mb-10 sm:mb-14 relative">
                     <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full mb-6 shadow-sm transition-colors">
                         <Music className="w-6 h-6" />
                     </div>
@@ -204,10 +235,23 @@ function CantoContent() {
                     </div>
                 </div>
 
+                {/* --- CONTENEDOR DEL VIDEO --- Aparece arriba de la letra si le dan al botón */}
+                {showVideo && youtubeId && (
+                    <div className="w-full max-w-2xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-slate-700 bg-black aspect-video animate-in fade-in slide-in-from-top-4 duration-300">
+                        <iframe
+                            src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1`}
+                            title="YouTube video player"
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        ></iframe>
+                    </div>
+                )}
+
+                {/* --- LETRA DE LA CANCIÓN --- */}
                 <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm sm:bg-white sm:dark:bg-slate-900 sm:shadow-xl sm:border border-gray-100 dark:border-slate-800 rounded-3xl p-6 sm:p-12 transition-all duration-300 max-w-4xl mx-auto overflow-hidden">
                     <div className="w-full pb-4">
 
-                        {/* --- NUEVO: Mostrar el tono si existen acordes activados y el canto tiene tono --- */}
                         {showChords && song.tone && (
                             <div className="mb-8 text-lg font-bold text-slate-900 dark:text-slate-100 text-center sm:text-left">
                                 Tono: <span className="text-orange-500 dark:text-orange-400 font-mono">{song.tone}</span>
@@ -229,6 +273,7 @@ function CantoContent() {
                 </div>
             </main>
 
+            {/* Píldora móvil */}
             <div className="sm:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
                 <div className="bg-slate-900/90 dark:bg-slate-800/90 backdrop-blur-md p-1.5 rounded-full shadow-2xl flex items-center gap-2 border border-slate-700/50 dark:border-slate-600/50">
                     <button onClick={decreaseFont} disabled={fontSize <= 14} className="p-3 text-white hover:bg-slate-700/50 rounded-full transition-all disabled:opacity-30 active:scale-95">

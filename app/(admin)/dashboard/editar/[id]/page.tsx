@@ -19,7 +19,8 @@ export default function EditarCantoPage() {
     const [title, setTitle] = useState("");
     const [lyrics, setLyrics] = useState("");
     const [artistId, setArtistId] = useState("");
-    const [tone, setTone] = useState(""); // <-- NUEVO ESTADO PARA EL TONO
+    const [tone, setTone] = useState("");
+    const [url, setUrl] = useState(""); // <-- NUEVO ESTADO PARA LA URL
 
     // Estados para el buscador interactivo de artistas
     const [artists, setArtists] = useState<Artist[]>([]);
@@ -52,7 +53,8 @@ export default function EditarCantoPage() {
                 // 3. Llenamos el formulario con los datos existentes
                 setTitle(songData.title);
                 setLyrics(songData.lyrics);
-                if (songData.tone) setTone(songData.tone); // <-- CARGAMOS EL TONO GUARDADO
+                if (songData.tone) setTone(songData.tone);
+                if (songData.url) setUrl(songData.url); // <-- CARGAMOS LA URL GUARDADA
 
                 // Como hicimos un .populate('artist') en el backend, artist viene como objeto
                 if (songData.artist) {
@@ -135,7 +137,7 @@ export default function EditarCantoPage() {
         setError("");
 
         if (!title || !artistId || !lyrics) {
-            setError("Por favor completa todos los campos y asegúrate de seleccionar un autor.");
+            setError("Por favor completa todos los campos obligatorios.");
             return;
         }
 
@@ -150,7 +152,8 @@ export default function EditarCantoPage() {
                     title,
                     artist: artistId,
                     lyrics,
-                    tone, // <-- ENVIAMOS EL TONO ACTUALIZADO AL BACKEND
+                    tone,
+                    url, // <-- ENVIAMOS LA URL ACTUALIZADA AL BACKEND
                 }),
             });
 
@@ -185,7 +188,7 @@ export default function EditarCantoPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Editar Canto</h1>
                     <p className="text-sm text-gray-500 mt-1">
-                        Modifica la letra, el autor, el título o el tono de la canción.
+                        Modifica la letra, el autor, el título, el tono o la URL de la canción.
                     </p>
                 </div>
             </div>
@@ -215,8 +218,8 @@ export default function EditarCantoPage() {
                         />
                     </div>
 
+                    {/* Fila 2: Autor y Tono */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Buscador Interactivo de Artistas */}
                         <div className="space-y-2 relative" ref={dropdownRef}>
                             <label className="block text-sm font-medium text-gray-700">
                                 Autor / Intérprete
@@ -282,7 +285,6 @@ export default function EditarCantoPage() {
                             )}
                         </div>
 
-                        {/* Campo Tono */}
                         <div className="space-y-2">
                             <label htmlFor="tone" className="block text-sm font-medium text-gray-700">
                                 Tono (Opcional)
@@ -298,6 +300,22 @@ export default function EditarCantoPage() {
                         </div>
                     </div>
 
+                    {/* Fila 3: URL ocupa todo el ancho */}
+                    <div className="space-y-2">
+                        <label htmlFor="url" className="block text-sm font-medium text-gray-700">
+                            Enlace de YouTube (Opcional)
+                        </label>
+                        <input
+                            id="url"
+                            type="url"
+                            value={url}
+                            onChange={(e) => setUrl(e.target.value)}
+                            placeholder="Ej. https://www.youtube.com/watch?v=..."
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+
+                    {/* Letra */}
                     <div className="space-y-2">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-1">
                             <label htmlFor="lyrics" className="block text-sm font-medium text-gray-700">

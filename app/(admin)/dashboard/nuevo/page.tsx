@@ -16,7 +16,8 @@ export default function NuevoCantoPage() {
     const [title, setTitle] = useState("");
     const [lyrics, setLyrics] = useState("");
     const [artistId, setArtistId] = useState("");
-    const [tone, setTone] = useState(""); // <-- NUEVO ESTADO PARA EL TONO
+    const [tone, setTone] = useState("");
+    const [url, setUrl] = useState(""); // <-- NUEVO ESTADO PARA LA URL
 
     const [artists, setArtists] = useState<Artist[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -107,7 +108,7 @@ export default function NuevoCantoPage() {
         setError("");
 
         if (!title || !artistId || !lyrics) {
-            setError("Por favor completa todos los campos y asegúrate de seleccionar un autor.");
+            setError("Por favor completa todos los campos obligatorios.");
             return;
         }
 
@@ -121,7 +122,8 @@ export default function NuevoCantoPage() {
                     title,
                     artist: artistId,
                     lyrics,
-                    tone, // <-- ENVIAMOS EL TONO
+                    tone,
+                    url, // <-- ENVIAMOS LA URL AL BACKEND
                 }),
             });
 
@@ -178,8 +180,8 @@ export default function NuevoCantoPage() {
                         />
                     </div>
 
+                    {/* Fila 2: Autor y Tono */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Buscador Interactivo de Artistas */}
                         <div className="space-y-2 relative" ref={dropdownRef}>
                             <label className="block text-sm font-medium text-gray-700">
                                 Autor / Intérprete
@@ -252,7 +254,6 @@ export default function NuevoCantoPage() {
                             )}
                         </div>
 
-                        {/* Campo Tono */}
                         <div className="space-y-2">
                             <label htmlFor="tone" className="block text-sm font-medium text-gray-700">
                                 Tono (Opcional)
@@ -268,6 +269,22 @@ export default function NuevoCantoPage() {
                         </div>
                     </div>
 
+                    {/* Fila 3: URL ocupa todo el ancho */}
+                    <div className="space-y-2">
+                        <label htmlFor="url" className="block text-sm font-medium text-gray-700">
+                            Enlace de YouTube (Opcional)
+                        </label>
+                        <input
+                            id="url"
+                            type="url"
+                            value={url}
+                            onChange={(e) => setUrl(e.target.value)}
+                            placeholder="Ej. https://www.youtube.com/watch?v=..."
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+
+                    {/* Letra */}
                     <div className="space-y-2">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-1">
                             <label htmlFor="lyrics" className="block text-sm font-medium text-gray-700">
