@@ -9,6 +9,7 @@ interface Song {
     _id: string;
     title: string;
     lyrics: string;
+    tone?: string; // Lo ponemos opcional por si hay cantos viejos que no lo tienen
     artist: { _id: string; name: string };
 }
 
@@ -79,8 +80,6 @@ function CantoContent() {
             const chunks = line.split(/(\[[^\]]+\][^\[]*)/g).filter(Boolean);
 
             return (
-                // AQUÍ ESTÁ LA MAGIA NUEVA: flex-wrap permite que si no cabe, baje a la siguiente línea.
-                // gap-y-3 asegura que si baja, deje un espacio para que no choque con la de arriba.
                 <div key={lineIndex} className="flex flex-wrap items-end gap-y-3 mb-3 sm:mb-5">
                     {chunks.map((chunk, chunkIndex) => {
                         let chord = "";
@@ -97,7 +96,6 @@ function CantoContent() {
                                 <span className="text-orange-500 dark:text-orange-400 font-bold min-h-[1.5rem] leading-none">
                                     {chord}
                                 </span>
-                                {/* whitespace-pre-wrap mantiene los espacios pero permite a la palabra romperse si es muy larga */}
                                 <span className="whitespace-pre-wrap text-slate-900 dark:text-slate-100">
                                     {text}
                                 </span>
@@ -207,13 +205,20 @@ function CantoContent() {
                 </div>
 
                 <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm sm:bg-white sm:dark:bg-slate-900 sm:shadow-xl sm:border border-gray-100 dark:border-slate-800 rounded-3xl p-6 sm:p-12 transition-all duration-300 max-w-4xl mx-auto overflow-hidden">
-                    {/* Quitamos el contenedor rígido con scroll para que la letra pueda bajar libremente */}
                     <div className="w-full pb-4">
+
+                        {/* --- NUEVO: Mostrar el tono si existen acordes activados y el canto tiene tono --- */}
+                        {showChords && song.tone && (
+                            <div className="mb-8 text-lg font-bold text-slate-900 dark:text-slate-100 text-center sm:text-left">
+                                Tono: <span className="text-orange-500 dark:text-orange-400 font-mono">{song.tone}</span>
+                            </div>
+                        )}
+
                         <div
                             className={`mx-auto ${showChords ? 'text-left font-mono tracking-tight' : 'text-center sm:text-left text-slate-800 dark:text-slate-200'} transition-all duration-300`}
                             style={{
                                 fontSize: `${fontSize}px`,
-                                whiteSpace: "pre-wrap", // Obligamos a que las palabras bajen si no caben
+                                whiteSpace: "pre-wrap",
                                 wordBreak: "break-word",
                                 lineHeight: showChords ? "normal" : "1.8"
                             }}

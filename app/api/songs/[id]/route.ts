@@ -11,7 +11,7 @@ type Context = {
 // GET: Obtener una canción específica por su ID
 export async function GET(request: Request, { params }: Context) {
     try {
-        const { id } = await params; // <--- AQUÍ ESTÁ LA MAGIA (Esperamos la promesa)
+        const { id } = await params;
 
         await dbConnect();
         const song = await Song.findById(id).populate('artist');

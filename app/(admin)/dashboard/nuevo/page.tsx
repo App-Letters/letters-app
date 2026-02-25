@@ -13,26 +13,22 @@ interface Artist {
 export default function NuevoCantoPage() {
     const router = useRouter();
 
-    // Estados del formulario general
     const [title, setTitle] = useState("");
     const [lyrics, setLyrics] = useState("");
     const [artistId, setArtistId] = useState("");
+    const [tone, setTone] = useState(""); // <-- NUEVO ESTADO PARA EL TONO
 
-    // Estados para el buscador interactivo de artistas
     const [artists, setArtists] = useState<Artist[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isLoadingArtists, setIsLoadingArtists] = useState(true);
     const [isCreatingArtist, setIsCreatingArtist] = useState(false);
 
-    // Estados de carga y error
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState("");
 
-    // Referencia para detectar clics fuera del buscador y cerrarlo
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Cargar artistas al inicio
     useEffect(() => {
         const fetchArtists = async () => {
             try {
@@ -49,16 +45,13 @@ export default function NuevoCantoPage() {
         fetchArtists();
     }, []);
 
-    // Cerrar el buscador si el usuario hace clic en otro lado de la pantalla
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsDropdownOpen(false);
-                // Si escribió algo pero no seleccionó nada, limpiamos la búsqueda o la restauramos
                 if (!artistId) {
                     setSearchTerm("");
                 } else {
-                    // Restaurar el nombre del artista seleccionado
                     const selected = artists.find(a => a._id === artistId);
                     if (selected) setSearchTerm(selected.name);
                 }
@@ -68,24 +61,20 @@ export default function NuevoCantoPage() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [artistId, artists]);
 
-    // Filtrar artistas según lo que escriba el usuario
     const filteredArtists = artists.filter(artist =>
         artist.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Comprobar si hay una coincidencia exacta para no mostrar el botón de "Agregar" duplicado
     const exactMatch = artists.find(
         artist => artist.name.toLowerCase() === searchTerm.toLowerCase().trim()
     );
 
-    // Función para seleccionar un artista de la lista
     const handleSelectArtist = (artist: Artist) => {
         setArtistId(artist._id);
         setSearchTerm(artist.name);
         setIsDropdownOpen(false);
     };
 
-    // Función para crear un artista "al vuelo"
     const handleCreateArtist = async () => {
         const newName = searchTerm.trim();
         if (!newName) return;
@@ -102,7 +91,6 @@ export default function NuevoCantoPage() {
 
             const newArtist = await response.json();
 
-            // Lo agregamos a la lista, lo seleccionamos automáticamente y cerramos el menú
             setArtists([...artists, newArtist]);
             setArtistId(newArtist._id);
             setSearchTerm(newArtist.name);
@@ -114,7 +102,6 @@ export default function NuevoCantoPage() {
         }
     };
 
-    // Enviar el formulario principal (Crear Canto)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
@@ -134,6 +121,7 @@ export default function NuevoCantoPage() {
                     title,
                     artist: artistId,
                     lyrics,
+                    tone, // <-- ENVIAMOS EL TONO
                 }),
             });
 
@@ -174,23 +162,23 @@ export default function NuevoCantoPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Campo Título */}
-                        <div className="space-y-2">
-                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                                Título del Canto
-                            </label>
-                            <input
-                                id="title"
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                placeholder="Ej. Cuan Grande es Él"
-                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
-                        </div>
+                    {/* Fila del Título ocupa todo el ancho */}
+                    <div className="space-y-2">
+                        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                            Título del Canto
+                        </label>
+                        <input
+                            id="title"
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="Ej. Cuan Grande es Él"
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Buscador Interactivo de Artistas */}
                         <div className="space-y-2 relative" ref={dropdownRef}>
                             <label className="block text-sm font-medium text-gray-700">
@@ -205,7 +193,7 @@ export default function NuevoCantoPage() {
                                     value={searchTerm}
                                     onChange={(e) => {
                                         setSearchTerm(e.target.value);
-                                        setArtistId(""); // Si el usuario edita, borramos el ID anterior para forzar que seleccione de nuevo
+                                        setArtistId("");
                                         setIsDropdownOpen(true);
                                     }}
                                     onFocus={() => setIsDropdownOpen(true)}
@@ -215,7 +203,6 @@ export default function NuevoCantoPage() {
                                 />
                             </div>
 
-                            {/* Menú desplegable */}
                             {isDropdownOpen && (
                                 <div className="absolute z-50 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-100 max-h-60 overflow-y-auto">
                                     {filteredArtists.length > 0 ? (
@@ -239,7 +226,6 @@ export default function NuevoCantoPage() {
                                         </div>
                                     )}
 
-                                    {/* Botón para agregar nuevo autor si no existe coincidencia exacta */}
                                     {searchTerm.trim() !== "" && !exactMatch && (
                                         <div className="p-2 border-t border-gray-100 bg-gray-50">
                                             <button
@@ -259,16 +245,29 @@ export default function NuevoCantoPage() {
                                     )}
                                 </div>
                             )}
-                            {/* Mensaje de validación si escribe pero no selecciona */}
                             {searchTerm && !artistId && !isDropdownOpen && (
                                 <p className="text-xs text-amber-600 mt-1">
                                     Debes seleccionar un autor de la lista o agregarlo.
                                 </p>
                             )}
                         </div>
+
+                        {/* Campo Tono */}
+                        <div className="space-y-2">
+                            <label htmlFor="tone" className="block text-sm font-medium text-gray-700">
+                                Tono (Opcional)
+                            </label>
+                            <input
+                                id="tone"
+                                type="text"
+                                value={tone}
+                                onChange={(e) => setTone(e.target.value)}
+                                placeholder="Ej. Bm, G, F#m"
+                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                            />
+                        </div>
                     </div>
 
-                    {/* Campo Letra */}
                     <div className="space-y-2">
                         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-1">
                             <label htmlFor="lyrics" className="block text-sm font-medium text-gray-700">

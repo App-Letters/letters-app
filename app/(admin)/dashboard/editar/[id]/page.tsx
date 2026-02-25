@@ -19,6 +19,7 @@ export default function EditarCantoPage() {
     const [title, setTitle] = useState("");
     const [lyrics, setLyrics] = useState("");
     const [artistId, setArtistId] = useState("");
+    const [tone, setTone] = useState(""); // <-- NUEVO ESTADO PARA EL TONO
 
     // Estados para el buscador interactivo de artistas
     const [artists, setArtists] = useState<Artist[]>([]);
@@ -27,7 +28,7 @@ export default function EditarCantoPage() {
     const [isCreatingArtist, setIsCreatingArtist] = useState(false);
 
     // Estados de carga y error
-    const [isLoading, setIsLoading] = useState(true); // Carga inicial de datos
+    const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState("");
 
@@ -51,6 +52,7 @@ export default function EditarCantoPage() {
                 // 3. Llenamos el formulario con los datos existentes
                 setTitle(songData.title);
                 setLyrics(songData.lyrics);
+                if (songData.tone) setTone(songData.tone); // <-- CARGAMOS EL TONO GUARDADO
 
                 // Como hicimos un .populate('artist') en el backend, artist viene como objeto
                 if (songData.artist) {
@@ -148,6 +150,7 @@ export default function EditarCantoPage() {
                     title,
                     artist: artistId,
                     lyrics,
+                    tone, // <-- ENVIAMOS EL TONO ACTUALIZADO AL BACKEND
                 }),
             });
 
@@ -182,7 +185,7 @@ export default function EditarCantoPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Editar Canto</h1>
                     <p className="text-sm text-gray-500 mt-1">
-                        Modifica la letra, el autor o el título de la canción.
+                        Modifica la letra, el autor, el título o el tono de la canción.
                     </p>
                 </div>
             </div>
@@ -197,21 +200,23 @@ export default function EditarCantoPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                                Título del Canto
-                            </label>
-                            <input
-                                id="title"
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
-                                required
-                            />
-                        </div>
+                    {/* Fila del Título ocupa todo el ancho */}
+                    <div className="space-y-2">
+                        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                            Título del Canto
+                        </label>
+                        <input
+                            id="title"
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Buscador Interactivo de Artistas */}
                         <div className="space-y-2 relative" ref={dropdownRef}>
                             <label className="block text-sm font-medium text-gray-700">
                                 Autor / Intérprete
@@ -276,18 +281,37 @@ export default function EditarCantoPage() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Campo Tono */}
+                        <div className="space-y-2">
+                            <label htmlFor="tone" className="block text-sm font-medium text-gray-700">
+                                Tono (Opcional)
+                            </label>
+                            <input
+                                id="tone"
+                                type="text"
+                                value={tone}
+                                onChange={(e) => setTone(e.target.value)}
+                                placeholder="Ej. Bm, G, F#m"
+                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                            />
+                        </div>
                     </div>
 
                     <div className="space-y-2">
-                        <div className="flex justify-between items-end">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-1">
                             <label htmlFor="lyrics" className="block text-sm font-medium text-gray-700">
                                 Letra completa
                             </label>
+                            <span className="text-xs text-gray-500">
+                                Opcional: Escribe los acordes entre corchetes [ ] antes de la sílaba.
+                            </span>
                         </div>
                         <textarea
                             id="lyrics"
                             value={lyrics}
                             onChange={(e) => setLyrics(e.target.value)}
+                            placeholder={"Escribe o pega la letra aquí...\n\nEjemplo de formato con acordes:\n[G]Bendice a [C]Israel alma [G]mía\n[G]Y YHWH te [C]dará de Su [D]bien\n[G]Bendice a [C]Israel alma [Em]mía [D] [C]\n[Am]No te olvides de [D]Jerusa[G]lén"}
                             rows={12}
                             className="w-full rounded-lg border-gray-300 border px-4 py-3 focus:ring-blue-500 focus:border-blue-500 resize-y"
                             required
