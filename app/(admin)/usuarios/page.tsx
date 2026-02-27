@@ -138,7 +138,8 @@ export default function UsuariosPage() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Correo electrónico"
-                            className="w-full rounded-lg border-gray-300 border px-4 py-2 focus:ring-blue-500"
+                            // FIX APLICADO AQUÍ
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500"
                             required
                         />
                     </div>
@@ -148,7 +149,8 @@ export default function UsuariosPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Contraseña"
-                            className="w-full rounded-lg border-gray-300 border px-4 py-2 focus:ring-blue-500"
+                            // FIX APLICADO AQUÍ
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500"
                             required
                             minLength={6}
                         />
@@ -157,7 +159,8 @@ export default function UsuariosPage() {
                         <select
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
-                            className="w-full rounded-lg border-gray-300 border px-4 py-2 focus:ring-blue-500 bg-white"
+                            // FIX APLICADO AQUÍ
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2 text-gray-900 bg-white focus:ring-blue-500"
                         >
                             <option value="admin">Administrador (Normal)</option>
                             <option value="superadmin">Superadmin (Total)</option>

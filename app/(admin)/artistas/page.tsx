@@ -168,7 +168,8 @@ export default function ArtistasPage() {
                         value={newArtistName}
                         onChange={(e) => setNewArtistName(e.target.value)}
                         placeholder="Ej. Joshua Aaron"
-                        className="flex-1 rounded-lg border-gray-300 border px-4 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        // FIX APLICADO: text-gray-900 bg-white placeholder:text-gray-400
+                        className="flex-1 rounded-lg border-gray-300 border px-4 py-2 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                         required
                     />
                     <button
@@ -203,7 +204,8 @@ export default function ArtistasPage() {
                                             type="text"
                                             value={editName}
                                             onChange={(e) => setEditName(e.target.value)}
-                                            className="flex-1 rounded-md border-gray-300 border px-3 py-1 focus:ring-blue-500 focus:border-blue-500"
+                                            // FIX APLICADO: text-gray-900 bg-white placeholder:text-gray-400
+                                            className="flex-1 rounded-md border-gray-300 border px-3 py-1 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                                             autoFocus
                                         />
                                         <button

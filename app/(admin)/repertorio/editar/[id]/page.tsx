@@ -91,7 +91,6 @@ export default function EditarRepertorioPage() {
         const matchesTitle = song.title.toLowerCase().includes(searchLower);
 
         // 2. ¿El término de búsqueda está en el nombre del artista? 
-        // (Usamos song.artist?.name por si algún canto llegara a tener el artista vacío por error en la BD)
         const matchesArtist = song.artist?.name?.toLowerCase().includes(searchLower) || false;
 
         // Si coincide con cualquiera de los dos, es un resultado válido
@@ -217,7 +216,8 @@ export default function EditarRepertorioPage() {
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                                // FIX APLICADO AQUÍ
+                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                                 required
                             />
                         </div>
@@ -231,7 +231,8 @@ export default function EditarRepertorioPage() {
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                                // FIX APLICADO AQUÍ
+                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                                 required
                             />
                         </div>
@@ -279,7 +280,8 @@ export default function EditarRepertorioPage() {
                                     }}
                                     onFocus={() => setIsDropdownOpen(true)}
                                     placeholder="Buscar cantos para agregar..."
-                                    className="w-full rounded-lg border-gray-300 border pl-10 pr-4 py-3 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                                    // FIX APLICADO AQUÍ (Mantenemos bg-gray-50 original del buscador pero forzamos el texto)
+                                    className="w-full rounded-lg border-gray-300 border pl-10 pr-4 py-3 text-gray-900 bg-gray-50 placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-colors"
                                 />
                             </div>
 

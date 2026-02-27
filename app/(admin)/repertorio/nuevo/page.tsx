@@ -195,7 +195,8 @@ export default function NuevoRepertorioPage() {
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 placeholder="Ej. Shabat, Reunión de Jóvenes..."
-                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                                // FIX APLICADO AQUÍ
+                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                                 required
                             />
                         </div>
@@ -209,7 +210,8 @@ export default function NuevoRepertorioPage() {
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                                // FIX APLICADO AQUÍ
+                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                                 required
                             />
                         </div>
@@ -261,7 +263,8 @@ export default function NuevoRepertorioPage() {
                                     }}
                                     onFocus={() => setIsDropdownOpen(true)}
                                     placeholder={isLoadingSongs ? "Cargando catálogo..." : "Buscar por título de canto..."}
-                                    className="w-full rounded-lg border-gray-300 border pl-10 pr-4 py-3 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                                    // FIX APLICADO AQUÍ (Forzamos texto oscuro y mantenemos su diseño original)
+                                    className="w-full rounded-lg border-gray-300 border pl-10 pr-4 py-3 text-gray-900 bg-gray-50 placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-colors"
                                     disabled={isLoadingSongs}
                                 />
                             </div>

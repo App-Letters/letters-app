@@ -17,7 +17,7 @@ export default function NuevoCantoPage() {
     const [lyrics, setLyrics] = useState("");
     const [artistId, setArtistId] = useState("");
     const [tone, setTone] = useState("");
-    const [url, setUrl] = useState(""); // <-- NUEVO ESTADO PARA LA URL
+    const [url, setUrl] = useState("");
 
     const [artists, setArtists] = useState<Artist[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -123,7 +123,7 @@ export default function NuevoCantoPage() {
                     artist: artistId,
                     lyrics,
                     tone,
-                    url, // <-- ENVIAMOS LA URL AL BACKEND
+                    url,
                 }),
             });
 
@@ -164,7 +164,7 @@ export default function NuevoCantoPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
 
-                    {/* Fila del Título ocupa todo el ancho */}
+                    {/* Fila del Título */}
                     <div className="space-y-2">
                         <label htmlFor="title" className="block text-sm font-medium text-gray-700">
                             Título del Canto
@@ -175,7 +175,8 @@ export default function NuevoCantoPage() {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Ej. Cuan Grande es Él"
-                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                            // FIX APLICADO
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                             required
                         />
                     </div>
@@ -200,7 +201,8 @@ export default function NuevoCantoPage() {
                                     }}
                                     onFocus={() => setIsDropdownOpen(true)}
                                     placeholder={isLoadingArtists ? "Cargando..." : "Buscar o crear autor..."}
-                                    className="w-full rounded-lg border-gray-300 border pl-10 pr-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                                    // FIX APLICADO
+                                    className="w-full rounded-lg border-gray-300 border pl-10 pr-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                                     disabled={isLoadingArtists}
                                 />
                             </div>
@@ -264,12 +266,13 @@ export default function NuevoCantoPage() {
                                 value={tone}
                                 onChange={(e) => setTone(e.target.value)}
                                 placeholder="Ej. Bm, G, F#m"
-                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                // FIX APLICADO
+                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500 font-mono"
                             />
                         </div>
                     </div>
 
-                    {/* Fila 3: URL ocupa todo el ancho */}
+                    {/* Fila 3: URL */}
                     <div className="space-y-2">
                         <label htmlFor="url" className="block text-sm font-medium text-gray-700">
                             Enlace de YouTube (Opcional)
@@ -280,7 +283,8 @@ export default function NuevoCantoPage() {
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
                             placeholder="Ej. https://www.youtube.com/watch?v=..."
-                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                            // FIX APLICADO
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
 
@@ -300,7 +304,8 @@ export default function NuevoCantoPage() {
                             onChange={(e) => setLyrics(e.target.value)}
                             placeholder={"Escribe o pega la letra aquí...\n\nEjemplo de formato con acordes:\n[G]Bendice a [C]Israel alma [G]mía\n[G]Y YHWH te [C]dará de Su [D]bien\n[G]Bendice a [C]Israel alma [Em]mía [D] [C]\n[Am]No te olvides de [D]Jerusa[G]lén"}
                             rows={12}
-                            className="w-full rounded-lg border-gray-300 border px-4 py-3 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                            // FIX APLICADO
+                            className="w-full rounded-lg border-gray-300 border px-4 py-3 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500 resize-y"
                             required
                         />
                     </div>

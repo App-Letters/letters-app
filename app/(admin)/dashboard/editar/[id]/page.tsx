@@ -20,7 +20,7 @@ export default function EditarCantoPage() {
     const [lyrics, setLyrics] = useState("");
     const [artistId, setArtistId] = useState("");
     const [tone, setTone] = useState("");
-    const [url, setUrl] = useState(""); // <-- NUEVO ESTADO PARA LA URL
+    const [url, setUrl] = useState("");
 
     // Estados para el buscador interactivo de artistas
     const [artists, setArtists] = useState<Artist[]>([]);
@@ -54,7 +54,7 @@ export default function EditarCantoPage() {
                 setTitle(songData.title);
                 setLyrics(songData.lyrics);
                 if (songData.tone) setTone(songData.tone);
-                if (songData.url) setUrl(songData.url); // <-- CARGAMOS LA URL GUARDADA
+                if (songData.url) setUrl(songData.url);
 
                 // Como hicimos un .populate('artist') en el backend, artist viene como objeto
                 if (songData.artist) {
@@ -144,7 +144,6 @@ export default function EditarCantoPage() {
         setIsSubmitting(true);
 
         try {
-            // Usamos el método PUT para actualizar en lugar de POST
             const response = await fetch(`/api/songs/${songId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -153,7 +152,7 @@ export default function EditarCantoPage() {
                     artist: artistId,
                     lyrics,
                     tone,
-                    url, // <-- ENVIAMOS LA URL ACTUALIZADA AL BACKEND
+                    url,
                 }),
             });
 
@@ -213,7 +212,8 @@ export default function EditarCantoPage() {
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                            // FIX DE COLORES AQUÍ: text-gray-900 bg-white placeholder:text-gray-400
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                             required
                         />
                     </div>
@@ -237,7 +237,9 @@ export default function EditarCantoPage() {
                                         setIsDropdownOpen(true);
                                     }}
                                     onFocus={() => setIsDropdownOpen(true)}
-                                    className="w-full rounded-lg border-gray-300 border pl-10 pr-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                                    // FIX DE COLORES AQUÍ
+                                    className="w-full rounded-lg border-gray-300 border pl-10 pr-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Buscar autor..."
                                 />
                             </div>
 
@@ -295,7 +297,8 @@ export default function EditarCantoPage() {
                                 value={tone}
                                 onChange={(e) => setTone(e.target.value)}
                                 placeholder="Ej. Bm, G, F#m"
-                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                // FIX DE COLORES AQUÍ
+                                className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500 font-mono"
                             />
                         </div>
                     </div>
@@ -311,7 +314,8 @@ export default function EditarCantoPage() {
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
                             placeholder="Ej. https://www.youtube.com/watch?v=..."
-                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500"
+                            // FIX DE COLORES AQUÍ
+                            className="w-full rounded-lg border-gray-300 border px-4 py-2.5 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
 
@@ -331,7 +335,8 @@ export default function EditarCantoPage() {
                             onChange={(e) => setLyrics(e.target.value)}
                             placeholder={"Escribe o pega la letra aquí...\n\nEjemplo de formato con acordes:\n[G]Bendice a [C]Israel alma [G]mía\n[G]Y YHWH te [C]dará de Su [D]bien\n[G]Bendice a [C]Israel alma [Em]mía [D] [C]\n[Am]No te olvides de [D]Jerusa[G]lén"}
                             rows={12}
-                            className="w-full rounded-lg border-gray-300 border px-4 py-3 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                            // FIX DE COLORES AQUÍ
+                            className="w-full rounded-lg border-gray-300 border px-4 py-3 text-gray-900 bg-white placeholder:text-gray-400 focus:ring-blue-500 focus:border-blue-500 resize-y"
                             required
                         />
                     </div>
