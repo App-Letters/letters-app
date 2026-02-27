@@ -3,14 +3,14 @@
 import { useState, useEffect, Suspense, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Loader2, ZoomIn, ZoomOut, AlertCircle, ChevronLeft, ChevronRight, Music, Guitar, Youtube, PlayCircle } from "lucide-react";
+import { ArrowLeft, Loader2, ZoomIn, ZoomOut, AlertCircle, ChevronLeft, ChevronRight, Music, Guitar, PlayCircle } from "lucide-react";
 
 interface Song {
     _id: string;
     title: string;
     lyrics: string;
     tone?: string;
-    url?: string; // <-- NUEVO: Agregado a la interfaz
+    url?: string;
     artist: { _id: string; name: string };
 }
 
@@ -27,7 +27,7 @@ function CantoContent() {
     const [fontSize, setFontSize] = useState(20);
 
     const [showChords, setShowChords] = useState(false);
-    const [showVideo, setShowVideo] = useState(false); // <-- ESTADO PARA EL VIDEO
+    const [showVideo, setShowVideo] = useState(false);
 
     const [prevSongId, setPrevSongId] = useState<string | null>(null);
     const [nextSongId, setNextSongId] = useState<string | null>(null);
@@ -69,56 +69,69 @@ function CantoContent() {
     const increaseFont = () => setFontSize(prev => Math.min(prev + 2, 44));
     const decreaseFont = () => setFontSize(prev => Math.max(prev - 2, 14));
 
-    // --- MAGIA: Extraer ID de YouTube de cualquier enlace ---
     const getYouTubeId = (url: string) => {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
         const match = url.match(regExp);
         return (match && match[2].length === 11) ? match[2] : null;
     };
 
-    // Obtenemos el ID solo si hay una URL
     const youtubeId = song?.url ? getYouTubeId(song.url) : null;
 
-    // --- LÓGICA DE ACORDES ---
     const getCleanLyrics = (text: string) => {
         return text.replace(/\[.*?\]/g, "");
     };
 
+    // --- LÓGICA DE ACORDES MEJORADA PARA MÓVIL ---
     const renderLyricsWithChords = useCallback((lyrics: string) => {
         return lyrics.split('\n').map((line, lineIndex) => {
-            if (!line.trim()) return <div key={lineIndex} className="h-6 sm:h-8"></div>;
+            // Si la línea está vacía, creamos un salto de línea limpio
+            if (!line.trim()) return <div key={lineIndex} className="h-4 sm:h-6"></div>;
 
             const chunks = line.split(/(\[[^\]]+\][^\[]*)/g).filter(Boolean);
+            const tokens: { chord: string; text: string }[] = [];
+
+            chunks.forEach(chunk => {
+                let chord = "";
+                let text = chunk;
+
+                if (chunk.startsWith('[')) {
+                    const parts = chunk.split(']');
+                    chord = parts[0].substring(1);
+                    text = parts[1] || "";
+                }
+
+                const words = text.split(/(\s+)/g).filter(Boolean);
+
+                if (words.length === 0) {
+                    tokens.push({ chord, text: "" });
+                } else {
+                    words.forEach((word, index) => {
+                        if (index === 0) {
+                            tokens.push({ chord, text: word });
+                        } else {
+                            tokens.push({ chord: "", text: word });
+                        }
+                    });
+                }
+            });
 
             return (
-                <div key={lineIndex} className="flex flex-wrap items-end gap-y-3 mb-3 sm:mb-5">
-                    {chunks.map((chunk, chunkIndex) => {
-                        let chord = "";
-                        let text = chunk;
-
-                        if (chunk.startsWith('[')) {
-                            const parts = chunk.split(']');
-                            chord = parts[0].substring(1);
-                            text = parts[1] || "";
-                        }
-
-                        return (
-                            <div key={chunkIndex} className="flex flex-col justify-end">
-                                <span className="text-orange-500 dark:text-orange-400 font-bold min-h-[1.5rem] leading-none">
-                                    {chord}
-                                </span>
-                                <span className="whitespace-pre-wrap text-slate-900 dark:text-slate-100">
-                                    {text}
-                                </span>
-                            </div>
-                        );
-                    })}
+                <div key={lineIndex} className="w-full">
+                    {tokens.map((token, tokenIndex) => (
+                        // AQUÍ ESTÁ LA SOLUCIÓN: pb-5 (padding-bottom) asegura que siempre haya un espacio vertical, incluso si envuelve en móvil
+                        <span key={tokenIndex} className="inline-flex flex-col justify-end align-bottom pb-5 sm:pb-6">
+                            <span className={`text-orange-600 dark:text-orange-400 font-bold min-h-[1.5em] leading-none mb-1 sm:mb-1.5 ${token.chord ? 'pr-2' : ''}`}>
+                                {token.chord}
+                            </span>
+                            <span className="whitespace-pre text-slate-900 dark:text-slate-100 leading-none">
+                                {token.text || '\u200B'}
+                            </span>
+                        </span>
+                    ))}
                 </div>
             );
         });
     }, []);
-
-    // ---------------------------------------
 
     if (isLoading) {
         return (
@@ -161,8 +174,6 @@ function CantoContent() {
                     </Link>
 
                     <div className="flex items-center gap-2 sm:gap-4">
-
-                        {/* --- BOTÓN DE YOUTUBE --- Aparece solo si hay ID válido */}
                         {youtubeId && (
                             <button
                                 onClick={() => setShowVideo(!showVideo)}
@@ -179,7 +190,6 @@ function CantoContent() {
                             </button>
                         )}
 
-                        {/* --- BOTÓN DE ACORDES --- */}
                         <button
                             onClick={() => setShowChords(!showChords)}
                             className={`p-2 rounded-full transition-all border flex items-center gap-2 active:scale-95 ${showChords
@@ -194,7 +204,6 @@ function CantoContent() {
                             </span>
                         </button>
 
-                        {/* Controles de repertorio */}
                         {playlistId && (
                             <div className="flex items-center bg-white dark:bg-slate-800 p-1 rounded-full border border-gray-200 dark:border-slate-700 shadow-sm">
                                 <Link href={prevSongId ? `/canto/${prevSongId}?playlist=${playlistId}` : '#'} className={`p-2 rounded-full transition-all ${prevSongId ? 'text-gray-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 active:scale-95' : 'text-gray-300 dark:text-slate-600 pointer-events-none'}`}>
@@ -235,7 +244,6 @@ function CantoContent() {
                     </div>
                 </div>
 
-                {/* --- CONTENEDOR DEL VIDEO --- Aparece arriba de la letra si le dan al botón */}
                 {showVideo && youtubeId && (
                     <div className="w-full max-w-2xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-slate-700 bg-black aspect-video animate-in fade-in slide-in-from-top-4 duration-300">
                         <iframe
@@ -251,23 +259,23 @@ function CantoContent() {
                 {/* --- LETRA DE LA CANCIÓN --- */}
                 <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm sm:bg-white sm:dark:bg-slate-900 sm:shadow-xl sm:border border-gray-100 dark:border-slate-800 rounded-3xl p-6 sm:p-12 transition-all duration-300 max-w-4xl mx-auto overflow-hidden">
                     <div className="w-full pb-4">
-
                         {showChords && song.tone && (
-                            <div className="mb-8 text-lg font-bold text-slate-900 dark:text-slate-100 text-center sm:text-left">
-                                Tono: <span className="text-orange-500 dark:text-orange-400 font-mono">{song.tone}</span>
+                            <div className="mb-10 text-lg font-bold text-slate-900 dark:text-slate-100 text-center sm:text-left">
+                                Tono: <span className="text-orange-600 dark:text-orange-400 font-mono">{song.tone}</span>
                             </div>
                         )}
 
                         <div
-                            className={`mx-auto ${showChords ? 'text-left font-mono tracking-tight' : 'text-center sm:text-left text-slate-800 dark:text-slate-200'} transition-all duration-300`}
-                            style={{
-                                fontSize: `${fontSize}px`,
-                                whiteSpace: "pre-wrap",
-                                wordBreak: "break-word",
-                                lineHeight: showChords ? "normal" : "1.8"
-                            }}
+                            className={`mx-auto ${showChords ? 'text-left font-mono tracking-tight' : 'text-center sm:text-left text-slate-800 dark:text-slate-200'} transition-all duration-300 w-full`}
+                            style={{ fontSize: `${fontSize}px` }}
                         >
-                            {showChords ? renderLyricsWithChords(song.lyrics) : getCleanLyrics(song.lyrics)}
+                            {showChords ? (
+                                renderLyricsWithChords(song.lyrics)
+                            ) : (
+                                <div className="whitespace-pre-wrap break-words" style={{ lineHeight: '1.8' }}>
+                                    {getCleanLyrics(song.lyrics)}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
